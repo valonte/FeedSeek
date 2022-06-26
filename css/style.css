@@ -835,12 +835,25 @@ ul.cont li {
      width: 100%;
 }
 
-.step7{
-     /* text-align: center; */
-     padding-top: 20px;
+.imgcenter{
+     display: block;
+     margin-left: auto;
+     margin-right: auto;
+     width: 50%;
+}
+
+.imgcaption{
+     text-align: center;
+     padding-bottom: 15px;
+     font-style: italic;
 }
 
 .othersolutions{
      padding-bottom: 20px;
 }
 
+.methodology{
+     text-align: justify;
+     padding-bottom: 10px;
+     padding-top: 10px;
+}

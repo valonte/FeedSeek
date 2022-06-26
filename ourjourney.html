@@ -89,58 +89,74 @@
             <div class="row">
                <div class="col-md-14">
                   <div class="titlepage">
-                     <h2>Processes on how we did this!</h2>
+                     <h2>Methodolody</h2>
+                     <p>There are five stages to our methodology. The first four stages develop the final web application, while stage 5 deals with Feed Ontario's ArcGIS online account.</p>
                      <span></span>
                   </div>
                   <div>
                      <ul>
                         <li class = "processes">
-                           <h3><strong>Step 1: Data Acquisition and preprocessing </strong></h3>
-                           <p>Content</p>
-                           <img src="images/step1.png" alt="Step 1"/>
+                           <img src="images/MethodologyStages.png" alt="Methodology Stages"/>
                         </li>
                         <li class = "processes">
-                           <h3><strong>Step 2: Data Extraction, Transformation, and Loading </strong></h3>
-                           <p>Content</p>
-                           <img src="images/step2.png" alt="Step 2"/>
-                        </li>                      
+                           <h3><strong>STAGE 1: Data Pre-Processing and Coordinate Assignment</strong></h3>
+                           <h4><strong>Part 1: Reference Table Creation</strong></h4>
+                           <p class="methodology">The reference table creation prepares three tables used in this stage's second part.</p>
+                           
+                           <p class="methodology">1.	Postal Code Conversion File (PCCF) Subset for Ontario is created using Microsoft Access with the where clause containing the provincial code. It also contains the single link indicator that determines the representative point for each postal code and the retirement date that selects all active postal codes.</p>
+                           <img class="imgcenter" src="images/stage1part1step1.png" alt="Stage 1 Part 1 Step 1"/>
+                           <p class = "imgcaption">SQL code to create the PCCF subset for Ontario</p>
+
+                           <p class="methodology">2.	The Forward Sortation Area (FSA) and Electoral Riding Percentage reference table used the tabulate intersection tool from ArcGIS Pro to calculate the area percentage of an FSA within an electoral riding.</p>
+                           <img class="imgcenter" src="images/stage1part1step2.png" alt="Stage 1 Part 1 Step 1"/>
+                           <p class = "imgcaption">Model to tabulate the area percentage of each forward sortation area within an electoral riding</p>
+
+                           <p class="methodology">3.	The Electoral Riding Centroid reference table contains the centroid coordinate of each of Ontario's 124 provincial electoral ridings.</p>
+                           <img class="imgcenter" src="images/stage1part1step3.png" alt="Stage 1 Part 1 Step 1"/>
+                           <p class = "imgcaption">Model to create the table containing the x and y coordinates of each provincial electoral riding for Ontario</p>
+                        </li>
+
                         <li class = "processes">
-                           <h3><strong>Step 3: Application of Cartographic Principles</strong></h3>
-                           <p>Content.</p>
-                           <img src="images/step3.png" alt="step3"/>
+                           <h4><strong>Part 2: Coordinate Assignment</strong></h4>
+                           <p class="methodology">The second part for this stage uses the reference tables (from part 1) to assign coordinates to each valid entry. The postal codes within each entry can contain errors since they are manually entered. All letter O were replaced with zeros to recover some of the data since all Canadian postal codes do not contain the letter O. It was then joined the PCCF subset to each table to assign them a location.</p>
+                           <p class="methodology">Entries not successfully joined were truncated to the first three characters of the Postal code, the FSA. This was then joined and multiplied with the electoral riding and FSA percentage reference table. Then location attributes were assigned using the electoral riding centroids. The image below outlines the entire process using FME workbench. The process was applied three times: 1) Unique individual visits table, 2) Duplicate (Multiple) visits table, and 3) Household composition, housing type, and income source categories.</p>
+                           <img src="images/stage1part2.png" alt="Stage 1 Part 2"/>
+                           <p class = "imgcaption">FME workspace to assign X and Y coordinates for household composition, housing type, and income source</p>
+                        </li>
+
+                        <li class = "processes">
+                           <h3><strong>STAGE 2: Spatial Analysis and Database Creation</strong></h3>
+                           <p class="methodology">The output from Stage 1 (Data Pre-Processing and Coordinate assignment Assignment) were spatially located using the XY table to point geoprocessing tool. A spatial join was then used to aggregate the points into their respective provincial electoral ridings. A final provincial electoral ridings polygon feature class was also created containing all the columns from the different tables. Two additional fields were added: population and food bank use per capita.</p>
+                           <img class="imgcenter" src="images/stage2img1.png" alt="Stage 2 Image 1"/>
+                           <p class = "imgcaption">Model to locate and spatially join each point to an Electoral riding with the attribute table also exported as an excel file</p>
+
+                           <img class="imgcenter" src="images/stage2img2.png" alt="Stage 2 Image 2"/>
+                           <p class = "imgcaption">Food Bank Use per Capita Equation</p>
                         </li>
                         <li class = "processes">
-                           <h3><strong>Step 4: Share the Datasets to ArcGIS Online</strong></h3>
-                           <p>Content</p>
-                           <img src="images/Webmap.PNG" alt="#"/>
-                           <img src="images/Step4b.JPG" alt="#"/>
+                           <h3><strong>STAGE 3: Web Map Creation (ArcGIS Map Viewer)</strong></h3>
+                           <p class="methodology">The third stage is the creation of the web map. Feed Ontario identified three ridings that should be labeled as Insufficient Food Bank Use Data since they lack a significant presence there. Five text fields essential for the experience builder app were added: Unique Individuals Text, Food Bank Use Per Capita Text, Unique Children Text, Unique Adults, and Duplicated Individuals Text. The table below shows the three ridings containing the different text attributes. The unique individuals is shown in the web app first. Therefore, it contains the "Insufficient Food Bank Use Data" Text. Food bank use per capita is the next prominent text, then the other 3. A thousand comma separator was added to the numbers too.</p>
+                           <img src="images/stage3img1.png" alt="#"/>
+                           <p class = "imgcaption">Part of the attribute table containg the 3 ridings with the different text attributes</p>
+
+                           <p class="methodology">Stage 3 is also a checkpoint before publishing as a web layer, with an initial symbology applied in ArcGIS Pro. Once published into ArcGIS Online, it is loaded into Map viewer and the pop-up, basemap, labels, symbology, and legend had their formatting finalized.</p>
+                           <img src="images/stage3img2.png" alt="#"/>
+                           <p class = "imgcaption">Web map used in ArcGIS Experience Builder</p>
                         </li>
                         <li class = "processes">
-                           <h3><strong>Step 5: Web Map Modification </strong></h3>
-                           <p>Content</p>
-                           <img src="images/step5.PNG" alt="#"/>
+                           <h3><strong>STAGE 4: Web Application Visualization (ArcGIS Experience Builder)</strong></h3>
+                           <p class="methodology">Stage 4 creates the web application in ArcGIS Experience Builder. It also creates the interactions and final visualization for the web map. The pie chart compares food bank visits between individual adults and children. Another three pie charts are used to visualize the socioeconomic make-up of food bank visitors. The dynamic text changes with each riding selected, while the search bar allows users to look for a riding or an address. We also used the view navigation widget, which is the tabs to select a view or a section. The section contains the three pie charts that the user can flip through. The buttons on the header are moved into the body as the screen size decreases.</p>
+                           <p class="methodology">The web map within the application also has the following tools and widgets. The home button zooms back to the initial map extents. The locate button allows the user to locate themselves on the map. The plus and minus symbol zooms the map in and out. The legend adds context to the symbology applied on the map. The three images below are the different screen size layouts (Large, Medium, Small).</p>
+                           <img src="images/stage4desktop.png" alt="#"/>
+                           <p class = "imgcaption">Large Screen Devices (Desktop View)</p>
+                           <img src="images/stage4tablet.png" alt="#"/>
+                           <p class = "imgcaption">Medium Screen Devices (Tablet View)</p>
+                           <img src="images/stage4mobile.png" alt="#"/>
+                           <p class = "imgcaption">Small Screen Devices (Mobile View)</p>
                         </li>
                         <li class = "processes">
-                           <h3><strong>Step 6: Web App Configuration</strong></h3>
-                           <p>Content</p>
-                           <img src="images/Step6.JPG" alt="#"/>
-                        </li>
-                        <li class = "processes">
-                           <h3><strong>Step 7: Mobile Optimization</strong></h3>
-                           <p>The team conducted meetings to ensure that the individual web app maintains the same look and feel. Responsiveness and mobile phone optimization were also considered; three different layouts were set. The first layout is for desktop or laptop displays. In this layout, all the widgets and map are in view, and none can be hidden. The sidebar widget was used for the tablet layout. The text, chart, and legend were all inside the side panel, which can be hidden from view when interacting with the map. The final layout is for small screen devices or mobile phones. The team decided that displaying the dynamic text is sufficient for this view. All the other widgets were moved to the pending list.</p>
-                           <h4 class = "step7"><strong>Dektop View</strong></h4>
-                           <img src="images/desktopview.JPG" alt="desktop view"/>
-                           <h4 class = "step7"><strong>Tablet View with the Side Panel</strong></h4>
-                           <img src="images/tabletview1.JPG" alt="tablet view 1"/>
-                           <h4 class = "step7"><strong>Tablet View with Side Panel Hidden</strong></h4>
-                           <img src="images/tabletview2.JPG" alt="tablet view 2"/>
-                           <h4 class = "step7"><strong>Mobile View</strong></h4>
-                           <img src="images/mobileview.JPG" alt="mobile view"/>
-                        </li>
-                        <li class = "processes">
-                           <h3><strong>Step 8: </strong></h3>
-                           <p>Content/p>
-                           <img src="images/Step8.png" alt="step 8"/>
+                           <h3><strong>STAGE 5: ArcGIS Online Clean-up and Back-up</strong></h3>
+                           <p class="methodology">Stage 5 aims to remove and download unnecessary items stored in ArcGIS Online. Comma-separated values (.csv) files, file geodatabase (.gdb), excel files (.xlsx), and shapefiles (.shp) were downloaded. They will be deleted to save some credits since these file types are not readily usable within ArcGIS Online. Additionally, all the downloaded files will be returned as a downloadable link.</p>
                         </li>
                      </ul>        
                   </div>
@@ -148,103 +164,6 @@
             </div>
          </div>
       </div>
-
-      <div class="clients">
-         <div class="container">
-            <div class="row">
-               <div class="col-md-6 offset-md-3">
-                  <div class="titlepage">
-                     <h2>Encountered Limitations</h2>
-                     <span></span>
-                  </div>
-               </div>
-            </div>
-         </div>
-
-         <div class="container">
-            
-            <div class="row">
-               <div class="col-md-12">
-                  <div class="clients_box">
-                     <h3><strong>Experience Builder Formatting</strong></h3>
-                     <p>When experimenting with the mobile UI setup, it was noticed that certain formatting attributes were shared amongst the various screen setups (desktop, tablet, mobile) and this made it more difficult when you could not adjust these attributes uniquely to each of the different setups (if required).  Sometimes it would be the case where you would want the formatting attributes to be shared, but other times they should be able to be 'unlocked' so that they can be set to their own unique value based on the screen setup (resolution or screen size).</p>
-                  </div>
-                  <div class="jonu">
-                     <h3><strong>Janelli Powell</strong></h3>
-                  </div>
-               </div>
-            </div>
-
-            <!--Pradeep-->
-            <div class="row">
-               <div class="col-md-12">
-                  <div class="clients_box">
-                     <h3><strong>Understanding the experince builder</strong></h3>
-                     <p> Working with Experience Builder was initially challenging for me, but as I gradually began to work and build my experience, I realised the full potential of this product. I also had to devote a significant amount of time to going through the documentation and tutorials in order to master the Experince Builder, i also worked on Dashboard and story map, I also worked on the dashboard and story map, but I found those two products to be very static, so they are relatively simple to create.</p>
-                  </div>
-                  <div class="jonu">
-                     <h3><strong>Pradeep Muppavarapu</strong></h3>
-                  </div>
-               </div>
-            </div>
-
-            <div class="row">
-               <div class="col-md-12">
-                  <div class="clients_box">
-                     <h3><strong>Collaborating in Experience Builder</strong></h3>
-                     <p>ArcGIS Experience Builder being an online-based web app solution, does not have any collaborative functionality. Users in the same ArcGIS Online organization cannot edit a user’s web experience. The only workaround I found was to copy the item ID of the web app to be edited, open it using this URL https://experience.arcgis.com/builder/?id={INSERT ItemID Here}, save to my contents, and start editing. Passing the edited content back has the same workflow. Specifications or meetings are guaranteed to be needed when collaborating in Experience Builder.</p>
-                  </div>
-                  <div class="jonu">
-                     <h3><strong>Vince Ruel Alonte</strong></h3>
-                  </div>
-               </div>
-            </div>
-            
-            <!--Jonghyeok-->
-            <div class="row">
-               <div class="col-md-12">
-                  <div class="clients_box">
-                     <h3><strong>Experience Builder Editing and Data Connection</strong></h3>
-                     <p>ArcGIS Experience Builder provides lots of modification and data connection options for the developers. However since it is a web app, it still has limitations in modification and data connection. For example, when the developer wants to put a legend for the data, the process of connecting data is complicated and not intuitive, also the developer can not modify the legend components.</p>
-                  </div>
-                  <div class="jonu">
-                     <h3><strong>Jeonghyeok Seo</strong></h3>
-                  </div>
-               </div>
-            </div>
-
-         </div>
-      </div>
-
-      <div class="clients">
-         <div class="container">
-            <div class="row">
-               <div class="col-md-6 offset-md-3">
-                  <div class="titlepage">
-                     <h2>Why Choose Experience Builder?</h2>
-                     <span></span>
-                  </div>
-               </div>
-            </div>
-         </div>
-
-         <div class="container">
-            <div class="row">
-               <div class="col-md-12">
-                  <div class="clients_box">
-                     <h3><strong>Experience with Experience Builder</strong></h3>
-                     <p>With ArcGIS Experience Builder, I was able to create a web map with functional widgets and charts without coding. The two tutorials I took introduced me to some of the functionalities of Experience Builder, and I was able to apply this new knowledge to our solution quickly.</p>
-                     <figure><a href="https://experience.arcgis.com/experience/6232dc15512c4827820fb91c273d2ace/"><img src="images/VATutorial1.JPG" alt="VA Tutorial 1"/></a></figure>
-                     <figure><a href="https://experience.arcgis.com/experience/65b53fecbe7e42e38416b1fa0dc91812/"><img src="images/VATutorial2.JPG" alt="VA Tutorial 1"/></a></figure>
-                  </div>
-                  <div class="jonu">
-                     <h3><strong>Vince Ruel Alonte</strong></h3>
-                  </div>
-               </div>
-            </div>
-         </div>
-      </div>
-      <!-- end clients -->
      
       <!--  footer -->
       <footer>
